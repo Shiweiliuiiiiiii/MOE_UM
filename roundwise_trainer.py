@@ -418,7 +418,7 @@ def main_roundwise(args):
         args.epochs=args.moe_epoch
         lr_scheduler, _ = create_scheduler(args, optimizer)
         criterion = torch.nn.CrossEntropyLoss()
-        for epoch in range(args.start_epoch, args.epochs):
+        for epoch in range(args.epochs):
             if args.distributed:
                 data_loader_train.sampler.set_epoch(epoch)
             train_stats = train_one_epoch(
