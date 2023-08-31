@@ -11,7 +11,7 @@ import torch
 
 from timm.data import Mixup
 from timm.utils import accuracy, ModelEma
-
+from timm import utils as utils1
 from losses import DistillationLoss
 import utils
 
@@ -19,12 +19,13 @@ def train_one_epoch(model: torch.nn.Module, criterion: DistillationLoss,
                     data_loader: Iterable, optimizer: torch.optim.Optimizer,
                     device: torch.device, epoch: int, loss_scaler, max_norm: float = 0,
                     model_ema: Optional[ModelEma] = None, mixup_fn: Optional[Mixup] = None,
-                    set_training_mode=True, args = None,dense=False):
+                    set_training_mode=True, args = None,dense=False,scheduler=None,updates_num=None):
     model.train(set_training_mode)
     metric_logger = utils.MetricLogger(delimiter="  ")
     metric_logger.add_meter('lr', utils.SmoothedValue(window_size=1, fmt='{value:.6f}'))
     header = 'Epoch: [{}]'.format(epoch)
     print_freq = 10
+    losses_m = utils1.AverageMeter()
 
     for samples, targets in metric_logger.log_every(data_loader, print_freq, header):
         samples = samples.to(device, non_blocking=True)
@@ -47,6 +48,11 @@ def train_one_epoch(model: torch.nn.Module, criterion: DistillationLoss,
                 loss = criterion( outputs, targets)
                 loss = loss + aux_loss
         loss_value = loss.item()
+        if not args.distributed:
+            losses_m.update(loss_value,samples.shape[0])
+        else:
+            reduced_loss = utils1.reduce_tensor(loss, args.world_size)
+            losses_m.update(reduced_loss.item() , samples.size(0))
 
         if not math.isfinite(loss_value):
             print("Loss is {}, stopping training".format(loss_value))
@@ -59,7 +65,9 @@ def train_one_epoch(model: torch.nn.Module, criterion: DistillationLoss,
         #is_second_order = hasattr(optimizer, 'is_second_order') and optimizer.is_second_order
         #loss_scaler(loss, optimizer, clip_grad=max_norm,
         #            parameters=model.parameters(), create_graph=is_second_order)
-
+        updates_num+=1
+        if scheduler is not None:
+            scheduler.step_update(num_updates=updates_num,metric=losses_m.avg)
         torch.cuda.synchronize()
         #if model_ema is not None:
         #    model_ema.update(model)
@@ -69,7 +77,7 @@ def train_one_epoch(model: torch.nn.Module, criterion: DistillationLoss,
     # gather the stats from all processes
     metric_logger.synchronize_between_processes()
     print("Averaged stats:", metric_logger)
-    return {k: meter.global_avg for k, meter in metric_logger.meters.items()}
+    return {k: meter.global_avg for k, meter in metric_logger.meters.items()},updates_num
 
 
 @torch.no_grad()
