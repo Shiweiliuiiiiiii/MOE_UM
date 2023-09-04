@@ -30,7 +30,7 @@ torchrun --nproc_per_node=$NUM_PROC roundwise_trainer.py \
   --finetinue_epoch 10 \
   --batch-size 128 \
   --data-path /ssd1/xinyu/datasets/imagenet_object_localization_challenge/ILSVRC/Data/CLS-LOC/ \
-  --output_dir ./
+  --output_dir ./10_30_10/
 
 
 #python -m torch.distributed.launch --nproc_per_node=1 --use_env roundwise_trainer.py --model deit_small_patch16_224 --pretrain_ck checkpoint_10.pth  --start_epoch 10 --moe_epoch 30 --num_round 1 --finetinue_epoch 10 --batch-size 256 --data-path /scratch-shared/boqian/imagenet --output_dir ./

@@ -638,15 +638,15 @@ def main_roundwise(args):
         for epoch in range(args.epochs):
             if args.distributed:
                 data_loader_train.sampler.set_epoch(epoch)
-            # train_stats,num_updates = train_one_epoch(
-            #     moe_model, criterion, data_loader_train,
-            #     optimizer, device, epoch, loss_scaler,
-            #     args.clip_grad, model_ema, mixup_fn,
-            #     set_training_mode=args.train_mode,  # keep in eval mode for deit finetuning / train mode for training and deit III finetuning
-            #     args = args,
-            #     scheduler=lr_scheduler,
-            #     updates_num=num_updates
-            # )
+            train_stats,num_updates = train_one_epoch(
+                moe_model, criterion, data_loader_train,
+                optimizer, device, epoch, loss_scaler,
+                args.clip_grad, model_ema, mixup_fn,
+                set_training_mode=args.train_mode,  # keep in eval mode for deit finetuning / train mode for training and deit III finetuning
+                args = args,
+                scheduler=lr_scheduler,
+                updates_num=num_updates
+            )
 
             #lr_scheduler.step(epoch)
             # if args.output_dir:
@@ -666,19 +666,19 @@ def main_roundwise(args):
             test_stats = evaluate(data_loader_val, moe_model, device)
             print(f"Accuracy of the network on the {len(dataset_val)} test images: {test_stats['acc1']:.1f}%")
             
-            # if max_accuracy_moe < test_stats["acc1"]:
-            #     max_accuracy_moe = test_stats["acc1"]
-            if args.output_dir:
-                checkpoint_paths = [args.output_dir + '/best_checkpoint_moe.pth']
-                for checkpoint_path in checkpoint_paths:
-                    utils.save_on_master({
-                        'model': moe_model.state_dict(),
-                        'optimizer': optimizer.state_dict(),
-                        'lr_scheduler': lr_scheduler.state_dict(),
-                        'epoch': epoch,
-                        'scaler': loss_scaler.state_dict(),
-                        'args': args,
-                    }, checkpoint_path)
+            if max_accuracy_moe < test_stats["acc1"]:
+                max_accuracy_moe = test_stats["acc1"]
+                if args.output_dir:
+                    checkpoint_paths = [args.output_dir + '/best_checkpoint_moe.pth']
+                    for checkpoint_path in checkpoint_paths:
+                        utils.save_on_master({
+                            'model': moe_model.state_dict(),
+                            'optimizer': optimizer.state_dict(),
+                            'lr_scheduler': lr_scheduler.state_dict(),
+                            'epoch': epoch,
+                            'scaler': loss_scaler.state_dict(),
+                            'args': args,
+                        }, checkpoint_path)
                 
             print(f'Max moe accuracy: {max_accuracy_moe:.2f}%')
 
