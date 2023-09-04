@@ -1,6 +1,6 @@
 
-#!/user/bin
-NUM_PROC=2
+#!/user/bi
+NUM_PROC=4
 torchrun --nproc_per_node=$NUM_PROC roundwise_trainer.py \
   --model deit_small_patch16_224 \
   --pretrained \
@@ -13,7 +13,6 @@ torchrun --nproc_per_node=$NUM_PROC roundwise_trainer.py \
   --warmup_updates 4000 \
   --lr 5e-4 \
   --weight-decay 0.05 \
-  --batch-size 1024 \
   --aa rand-m9-mstd0.5 \
   --smoothing 0.2 \
   --mixup 0.8 \
@@ -29,8 +28,9 @@ torchrun --nproc_per_node=$NUM_PROC roundwise_trainer.py \
   --moe_epoch 30 \
   --num_round 1 \
   --finetinue_epoch 10 \
-  --batch-size 256 \
-  --data-path /scratch-shared/boqian/imagenet \
+  --batch-size 128 \
+  --data-path /ssd1/xinyu/datasets/imagenet_object_localization_challenge/ILSVRC/Data/CLS-LOC/ \
   --output_dir ./
+
 
 #python -m torch.distributed.launch --nproc_per_node=1 --use_env roundwise_trainer.py --model deit_small_patch16_224 --pretrain_ck checkpoint_10.pth  --start_epoch 10 --moe_epoch 30 --num_round 1 --finetinue_epoch 10 --batch-size 256 --data-path /scratch-shared/boqian/imagenet --output_dir ./
