@@ -1,6 +1,6 @@
 
 #!/user/bi
-NUM_PROC=4
+NUM_PROC=8
 torchrun --nproc_per_node=$NUM_PROC roundwise_trainer.py \
   --model deit_small_patch16_224 \
   --pretrained \
