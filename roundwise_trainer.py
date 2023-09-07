@@ -638,15 +638,18 @@ def main_roundwise(args):
         for epoch in range(args.epochs):
             if args.distributed:
                 data_loader_train.sampler.set_epoch(epoch)
-            train_stats,num_updates = train_one_epoch(
-                moe_model, criterion, data_loader_train,
-                optimizer, device, epoch, loss_scaler,
-                args.clip_grad, model_ema, mixup_fn,
-                set_training_mode=args.train_mode,  # keep in eval mode for deit finetuning / train mode for training and deit III finetuning
-                args = args,
-                scheduler=lr_scheduler,
-                updates_num=num_updates
-            )
+
+            # train_stats,num_updates = train_one_epoch(
+            #     moe_model, criterion, data_loader_train,
+            #     optimizer, device, epoch, loss_scaler,
+            #     args.clip_grad, model_ema, mixup_fn,
+            #     set_training_mode=args.train_mode,  # keep in eval mode for deit finetuning / train mode for training and deit III finetuning
+            #     args = args,
+            #     scheduler=lr_scheduler,
+            #     updates_num=num_updates
+            # )
+
+
 
             #lr_scheduler.step(epoch)
             # if args.output_dir:
@@ -688,8 +691,9 @@ def main_roundwise(args):
                         'n_parameters': n_parameters}
             
             if args.output_dir and utils.is_main_process():
-                with (args.output_dir + "/log.txt").open("a") as f:
+                with open(args.output_dir + "/log.txt", "a") as f:
                     f.write(json.dumps(log_stats) + "\n")
+
         print(f"Dense finetuning at round:{round}")
         if args.merge_type == "average":
             merge_fn = merge_by_average
@@ -770,7 +774,7 @@ def main_roundwise(args):
                         'n_parameters': n_parameters}
             
             if args.output_dir and utils.is_main_process():
-                with (args.output_dir + "/log.txt").open("a") as f:
+                with open(args.output_dir + "/log.txt", "a") as f:
                     f.write(json.dumps(log_stats) + "\n")
 
     total_time = time.time() - start_time
