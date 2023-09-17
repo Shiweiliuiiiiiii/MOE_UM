@@ -587,8 +587,6 @@ def main_roundwise(args):
         dense_model.to(device)
         dense_model = torch.nn.parallel.DistributedDataParallel(dense_model, device_ids=[args.gpu],find_unused_parameters=True)
         dense_model_without_ddp = dense_model.module
-        
-
 
 
     n_parameters = sum(p.numel() for p in dense_model.parameters() if p.requires_grad)
@@ -596,7 +594,7 @@ def main_roundwise(args):
 
     print("evaluate on the loaded dense model")
     # print(moe_model)
-    evaluate(data_loader_val, dense_model, device)
+    evaluate(data_loader_val, dense_model, device, dense=False)
     #if not args.unscale_lr:
     #    linear_scaled_lr = args.lr * args.batch_size * utils.get_world_size() / 512.0
     #    args.lr = linear_scaled_lr

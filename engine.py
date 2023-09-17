@@ -113,4 +113,5 @@ def evaluate(data_loader, model, device,dense=False):
     print('* Acc@1 {top1.global_avg:.3f} Acc@5 {top5.global_avg:.3f} loss {losses.global_avg:.3f}'
           .format(top1=metric_logger.acc1, top5=metric_logger.acc5, losses=metric_logger.loss))
 
+
     return {k: meter.global_avg for k, meter in metric_logger.meters.items()}

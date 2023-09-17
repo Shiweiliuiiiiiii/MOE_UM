@@ -1,7 +1,7 @@
 
 #!/user/bi
 NUM_PROC=8
-torchrun --nproc_per_node=1 roundwise_trainer.py \
+torchrun --nproc_per_node=2 roundwise_trainer.py \
   --model deit_small_patch16_224 \
   --pretrained \
   --epochs 300 \
@@ -23,7 +23,7 @@ torchrun --nproc_per_node=1 roundwise_trainer.py \
   --output ./ \
   --workers 1 \
   --recovery-interval 1251 \
-  --pretrain_ck checkpoint_10.pth  \
+  --pretrain_ck checkpoint_50.pth  \
   --start_epoch 10 \
   --moe_epoch 30 \
   --num_round 1 \
