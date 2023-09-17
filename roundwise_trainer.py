@@ -596,7 +596,7 @@ def main_roundwise(args):
 
     print("evaluate on the loaded dense model")
     # print(moe_model)
-    evaluate(data_loader_val, moe_model, device)
+    evaluate(data_loader_val, dense_model, device)
     #if not args.unscale_lr:
     #    linear_scaled_lr = args.lr * args.batch_size * utils.get_world_size() / 512.0
     #    args.lr = linear_scaled_lr
