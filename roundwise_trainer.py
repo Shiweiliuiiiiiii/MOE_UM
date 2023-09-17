@@ -561,7 +561,10 @@ def main_roundwise(args):
     checkpoints=torch.load(args.pretrain_ck)
     dense_model.load_state_dict(checkpoints['model'])
     moe_model = vit_moe_mlp16E4_small()
-    
+
+    print("evaluate on the loaded dense model")
+    # print(moe_model)
+    evaluate(data_loader_val, moe_model, device)
 
     model_ema = None
     if args.model_ema:
