@@ -1,7 +1,7 @@
 
 #!/user/bi
 NUM_PROC=8
-torchrun --nproc_per_node=$NUM_PROC roundwise_trainer.py \
+torchrun --nproc_per_node=1 roundwise_trainer.py \
   --model deit_small_patch16_224 \
   --pretrained \
   --epochs 300 \

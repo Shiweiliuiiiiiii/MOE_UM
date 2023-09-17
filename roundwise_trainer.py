@@ -562,9 +562,6 @@ def main_roundwise(args):
     dense_model.load_state_dict(checkpoints['model'])
     moe_model = vit_moe_mlp16E4_small()
 
-    print("evaluate on the loaded dense model")
-    # print(moe_model)
-    evaluate(data_loader_val, moe_model, device)
 
     model_ema = None
     if args.model_ema:
@@ -596,6 +593,10 @@ def main_roundwise(args):
 
     n_parameters = sum(p.numel() for p in dense_model.parameters() if p.requires_grad)
     print('number of params:', n_parameters)
+
+    print("evaluate on the loaded dense model")
+    # print(moe_model)
+    evaluate(data_loader_val, moe_model, device)
     #if not args.unscale_lr:
     #    linear_scaled_lr = args.lr * args.batch_size * utils.get_world_size() / 512.0
     #    args.lr = linear_scaled_lr
