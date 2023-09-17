@@ -75,10 +75,10 @@ class MoE(nn.Module):
                           2 * num_experts if noisy_gating else num_experts,
                           bias=False)
             )
-            nn.init.zeros_(self.f_gate[-1].weight)
+            # nn.init.zeros_(self.f_gate[-1].weight)
         else:
             self.f_gate = nn.Linear(input_size, num_experts, bias=False)
-            nn.init.zeros_(self.f_gate.weight)
+            # nn.init.zeros_(self.f_gate.weight)
 
 
     def extra_repr(self):
