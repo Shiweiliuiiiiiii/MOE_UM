@@ -572,6 +572,9 @@ def main_roundwise(args):
             device='cpu' if args.model_ema_force_cpu else '',
             resume='')
 
+    moe_model = load_from_dense_pretrained_to_moe(moe_model, dense_model.state_dict(),
+                                                  num_experts=16)  # TODO: import upcycle fn
+
     #model_without_ddp = model
     if args.distributed:
         num_tasks = utils.get_world_size()
@@ -610,7 +613,7 @@ def main_roundwise(args):
     for round in range(args.num_round):
         print(f"Moe training at round:{round}")        
         print("start upscaling")        
-        moe_model = load_from_dense_pretrained_to_moe(moe_model, dense_model.state_dict(), num_experts=16) # TODO: import upcycle fn
+        # moe_model = load_from_dense_pretrained_to_moe(moe_model, dense_model.state_dict(), num_experts=16) # TODO: import upcycle fn
         #optimizer = create_optimizer(args, moe_model)
         optimizer = create_optimizer_v2(
             moe_model,
